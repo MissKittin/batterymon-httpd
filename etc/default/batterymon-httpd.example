@@ -1,0 +1,13 @@
+# Copy this file to batterymon-httpd
+
+# define the port on which the server listens
+HTTPD_PORT='8443'
+
+# define the IP address (v4 or v6) on which the server listens
+# e.g. 0.0.0.0 for IPv4 or [::] for IPv6
+# hint: if bindv6only is disabled and you use IPv6, the server will also be accessible via IPv4
+HTTPD_ADDR='[::]'
+
+# define permissions in the system
+USER='nobody'
+GROUP='nogroup'

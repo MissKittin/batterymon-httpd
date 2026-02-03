@@ -1,0 +1,22 @@
+[Unit]
+Description=batterymon HTTPd
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+Environment=HTTPD_PORT=8443
+Environment=HTTPD_ADDR=[::]
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONPYCACHEPREFIX=/tmp/.batterymon-httpd-pyc
+EnvironmentFile=-/usr/local/share/batterymon-httpd/etc/default/batterymon-httpd
+User=nobody
+Group=nogroup
+ExecStartPre=/bin/mkdir -p /tmp/.batterymon-httpd-pyc
+ExecStartPre=/bin/chmod 700 /tmp/.batterymon-httpd-pyc
+ExecStart=/usr/local/share/batterymon-httpd/bin/batterymon-httpd.py $HTTPD_PORT $HTTPD_ADDR
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
