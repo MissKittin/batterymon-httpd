@@ -19,7 +19,7 @@ BATTERYMON_HTTPD="$(readlink -f "${0}")"; BATTERYMON_HTTPD="${BATTERYMON_HTTPD%/
 
 PIDFILE='/var/run/batterymon-httpd.pid'
 DAEMON='/usr/bin/env'
-DAEMON_OPTS='PYTHONPYCACHEPREFIX=/tmp/.batterymon-httpd-pyc '"${BATTERYMON}"'/bin/batterymon-httpd.py '"${HTTPD_PORT} ${HTTPD_ADDR}"
+DAEMON_OPTS='PYTHONPYCACHEPREFIX=/tmp/.batterymon-httpd-pyc '"${BATTERYMON_HTTPD}"'/bin/batterymon-httpd.py '"${HTTPD_PORT} ${HTTPD_ADDR}"
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 
