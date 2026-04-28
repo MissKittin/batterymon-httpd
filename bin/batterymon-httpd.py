@@ -4,7 +4,7 @@ import os
 import sys
 import ssl
 import socket
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
 
 PROG_DIR=os.path.abspath(os.path.dirname(__file__)+"/..")
 
@@ -20,9 +20,6 @@ from share import (
     routes_trace,
     routes_connect
 )
-
-class HTTPServerV6(HTTPServer):
-    address_family=socket.AF_INET6
 
 class SimpleHandler(BaseHTTPRequestHandler):
     _ROUTES={
@@ -84,11 +81,24 @@ class SimpleHandler(BaseHTTPRequestHandler):
 
     do_GET=do_POST=do_HEAD=do_PUT=do_DELETE=do_OPTIONS=do_PATCH=do_TRACE=do_CONNECT=_handle_method
 
-if len(sys.argv) < 3:
+if len(sys.argv) < 4:
     print("Usage:")
-    print(" "+sys.argv[0]+" 8443 0.0.0.0")
-    print(" "+sys.argv[0]+" 8443 ::")
+    print(" "+sys.argv[0]+" 8443 0.0.0.0 single|multi")
+    print(" "+sys.argv[0]+" 8443 [::] single|multi")
     sys.exit(1)
+
+if sys.argv[3] == "multi":
+    class HTTPServerV4(ThreadingHTTPServer):
+        pass
+
+    class HTTPServerV6(ThreadingHTTPServer):
+        address_family=socket.AF_INET6
+else:
+    class HTTPServerV4(HTTPServer):
+        pass
+
+    class HTTPServerV6(HTTPServer):
+        address_family=socket.AF_INET6
 
 if sys.argv[2].startswith("[") and sys.argv[2].endswith("]"):
     httpd=HTTPServerV6(
@@ -96,7 +106,7 @@ if sys.argv[2].startswith("[") and sys.argv[2].endswith("]"):
         SimpleHandler
     )
 else:
-    httpd=HTTPServer(
+    httpd=HTTPServerV4(
         (sys.argv[2], int(sys.argv[1])),
         SimpleHandler
     )

@@ -8,6 +8,10 @@ HTTPD_PORT='8443'
 # hint: if bindv6only is disabled and you use IPv6, the server will also be accessible via IPv4
 HTTPD_ADDR='[::]'
 
+# use single-threaded (single) or multi-threaded (multi) mode
+# note: multi-threaded mode may be heavier than single-threaded
+HTTPD_MODE='single'
+
 # define permissions in the system
 USER='nobody'
 GROUP='nogroup'
