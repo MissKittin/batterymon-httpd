@@ -30,11 +30,10 @@ You can optionally change the startup settings. For more information, see the `e
 Create a `shared` directory - all route logic will be there.  
 The server doesn't include any routing files - you have to write them yourself.  
 This is where you'll put your Python code. Routes are added to the registry via entries in `__init__.py`.  
-These files must contain two functions: `route_METHOD` and `handle_METHOD`, where `METHOD` is the lowercase name of the HTTP method to be handled.  
-The `route_METHOD` function checks whether the request should be handled, and the `handle_METHOD` function handles it.  
-Both methods return a boolean; if they return `True`, the server considers the request handled; if `False`, handling the request is passed to the next route.  
-The `route_METHOD` functions take two arguments: `request` - this is a `BaseHTTPRequestHandler` instance - you can refer to its fields and methods, and `request_path` - the equivalent of `BaseHTTPRequestHandler.path`.  
-Similarly for `handle_METHOD`: `response` - an instance of `BaseHTTPRequestHandler`, and `send_response` is a function that facilitates sending data and accepts arguments: `int-response-code`, `{http-headers}` and `response-body`.
+These files must contain the `handle_METHOD` function, where `METHOD` is the lowercase name of the HTTP method to be handled.  
+This function returns a boolean; if it returns `True`, the server considers the request to have been handled; if `False`, handling of the request is passed to the next route.  
+It takes three arguments: `response` - is an instance of `BaseHTTPRequestHandler` - you can refer to its fields and methods, `request_path` - the equivalent of `BaseHTTPRequestHandler.path`, and `send_response` is a function that facilitates sending data and accepts arguments: `int-response-code`, `{http-headers}` and `response-body` (string or bytes).  
+The `send_response` function requires only the first two arguments. The `{http-headers}` (`http_headers`) and `response-body` (`string`) arguments are optional. Additionally, there's an `add_content_length` argument (boolean - automatically adding the `Content-Length` header): when `False`, this functionality is disabled.
 
 The server supports the following methods:
 * `get`
@@ -50,20 +49,31 @@ The server supports the following methods:
 An example route for `/path` (`route_myroute.py`) looks like this:
 ```
 def route_get(request, request_path):
+    # this function is for backward compatibility
+    # you can place the code from this function directly in the handle function
+
     return request_path == "/path"
 
-def handle_get(response, send_response):
-    send_response(200, {"Content-Type": "text/html"}, "<h1>/path detected</h1>")
+def handle_get(response, request_path, send_response):
+    if not route_get(response, request_path):
+        return False
+
+    send_response(
+        200, {"Content-Type": "text/html"},
+        "<h1>/path detected</h1>"
+    )
+
     return True
 ```
 
 Example default route (`route_default.py`) (always added to the end of the `routes_get` array in `__init__.py`)
 ```
-def route_get(request, request_path):
-    return True
-
 def handle_get(response, send_response):
-    send_response(404, {"Content-Type": "text/html"}, "<h1>It works but 404 Not Found!</h1>")
+    send_response(
+        404, {"Content-Type": "text/html"},
+        "<h1>It works but 404 Not Found!</h1>"
+    )
+
     return True
 ```
 

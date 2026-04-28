@@ -66,13 +66,9 @@ class SimpleHandler(BaseHTTPRequestHandler):
             return
 
         for module in routes:
-            route_fn=getattr(module, "route_"+method, None)
             handle_fn=getattr(module, "handle_"+method, None)
 
-            if route_fn and not route_fn(self, self.path):
-                continue
-
-            if handle_fn and handle_fn(self, self._send_response):
+            if handle_fn and handle_fn(self, self.path, self._send_response):
                 return
 
         if method == "get":
