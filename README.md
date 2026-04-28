@@ -83,6 +83,16 @@ routes_options=[]
 routes_patch=[]
 routes_trace=[]
 routes_connect=[]
+
+# here you can override the class
+# from the handler argument via inheritance
+# and return it
+def wrap_http_handler(handler):
+    return handler
+
+# here you can configure the ssl.SSLContext instance (remove pass)
+def configure_ssl_context(ssl_context):
+    pass
 ```
 **Warning:** if a method has no routes, it must be left empty as in the example above!
 

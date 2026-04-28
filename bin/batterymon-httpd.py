@@ -18,7 +18,9 @@ from share import (
     routes_options,
     routes_patch,
     routes_trace,
-    routes_connect
+    routes_connect,
+    wrap_http_handler,
+    configure_ssl_context
 )
 
 class SimpleHandler(BaseHTTPRequestHandler):
@@ -105,12 +107,12 @@ else:
 if sys.argv[2].startswith("[") and sys.argv[2].endswith("]"):
     httpd=HTTPServerV6(
         (sys.argv[2][1:-1], int(sys.argv[1])),
-        SimpleHandler
+        wrap_http_handler(SimpleHandler)
     )
 else:
     httpd=HTTPServerV4(
         (sys.argv[2], int(sys.argv[1])),
-        SimpleHandler
+        wrap_http_handler(SimpleHandler)
     )
 
 if os.path.isdir(PROG_DIR+"/etc/ssl"):
@@ -122,6 +124,7 @@ if os.path.isdir(PROG_DIR+"/etc/ssl"):
     context.load_verify_locations(cafile=PROG_DIR+"/etc/ssl/ca.pem")
     context.verify_mode=ssl.CERT_REQUIRED
 
+    configure_ssl_context(context)
     httpd.socket=context.wrap_socket(httpd.socket, server_side=True)
 else:
     print("Notice: SSL disabled")
