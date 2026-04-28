@@ -34,24 +34,26 @@ class SimpleHandler(BaseHTTPRequestHandler):
         "connect": routes_connect,
     }
 
-    def _send_response(self, code, http_headers=None, string=None):
+    def _send_response(self, code, http_headers=None, string=None, add_content_length=True):
+        http_headers=http_headers or {}
         self.send_response_only(code)
-
-        if http_headers:
-            for header_name, header_value in http_headers.items():
-                self.send_header(header_name, header_value)
 
         if string is not None:
             if not isinstance(string, bytes):
                 string=string.encode("utf-8")
 
-            self.send_header("Content-Length", str(len(string)))
-            self.end_headers()
+            if add_content_length and "Content-Length" not in http_headers:
+                http_headers["Content-Length"]=str(len(string))
+        elif add_content_length and "Content-Length" not in http_headers:
+            http_headers["Content-Length"]="0"
 
-            return self.wfile.write(string)
+        for header_name, header_value in http_headers.items():
+            self.send_header(header_name, header_value)
 
-        self.send_header("Content-Length", "0")
         self.end_headers()
+
+        if string is not None:
+            self.wfile.write(string)
 
     def _handle_method(self):
         method=self.command.lower()
