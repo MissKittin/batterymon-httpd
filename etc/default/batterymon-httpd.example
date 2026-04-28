@@ -11,3 +11,9 @@ HTTPD_ADDR='[::]'
 # define permissions in the system
 USER='nobody'
 GROUP='nogroup'
+
+# set your own PATH variable
+#CUSTOM_PYTHON_PATH='/opt/python:/bin:/usr/bin:/usr/local/bin'
+
+# clean sysvinit environment (if true, use /usr/bin/env - /path/to/batterymon-httpd.py)
+#HTTPD_CLEAN_ENV='false'

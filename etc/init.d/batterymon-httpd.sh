@@ -11,15 +11,20 @@
 # Settings
 HTTPD_PORT='8443'
 HTTPD_ADDR='[::]'
+HTTPD_CLEAN_ENV='false'
 USER='nobody'
 GROUP='nogroup'
+CUSTOM_PYTHON_PATH=''
+CUSTOM_PYTHON_CACHE_PATH='/tmp/.batterymon-httpd-pyc'
 BATTERYMON_HTTPD="$(readlink -f "${0}")"; BATTERYMON_HTTPD="${BATTERYMON_HTTPD%/*}/../.."
 
 [ -f "${BATTERYMON_HTTPD}/etc/default/batterymon-httpd" ] && . "${BATTERYMON_HTTPD}/etc/default/batterymon-httpd"
 
 PIDFILE='/var/run/batterymon-httpd.pid'
 DAEMON='/usr/bin/env'
-DAEMON_OPTS='PYTHONPYCACHEPREFIX=/tmp/.batterymon-httpd-pyc '"${BATTERYMON_HTTPD}"'/bin/batterymon-httpd.py '"${HTTPD_PORT} ${HTTPD_ADDR}"
+DAEMON_OPTS='PYTHONPYCACHEPREFIX='"${CUSTOM_PYTHON_CACHE_PATH}"' '"${BATTERYMON_HTTPD}"'/bin/batterymon-httpd.py '"${HTTPD_PORT} ${HTTPD_ADDR}"
+[ ! "${CUSTOM_PYTHON_PATH}" = '' ] && DAEMON_OPTS="PATH=${CUSTOM_PYTHON_PATH} ${DAEMON_OPTS}"
+"${HTTPD_CLEAN_ENV}" && DAEMON_OPTS="- ${DAEMON_OPTS}"
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 
